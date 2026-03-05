@@ -1,0 +1,191 @@
+entry_point: agents.cilrs.cilrs_agent_unit:CilrsAgent
+ckpt: null
+wb_run_path: local
+wb_ckpt_step: null
+rl_run_path: iccv21-roach/trained-models/1929isj0
+rl_ckpt_step: 11833344
+env_wrapper:
+  entry_point: agents.cilrs.cilrs_wrapper:CilrsWrapper
+  kwargs:
+    acc_as_action: true
+    view_augmentation: false
+    value_as_supervision: true
+    value_factor: 1.0
+    action_distribution: beta_shared
+    dim_features_supervision: 256
+    input_states:
+    - speed
+    - vec
+    - cmd
+    im_mean:
+    - 0.5
+    - 0.5
+    - 0.5
+    im_std:
+    - 0.5
+    - 0.5
+    - 0.5
+    im_stack_idx:
+    - -1
+policy:
+  entry_point: agents.cilrs.models.cilrs_unit_model:CoILICRA_UNIT
+  kwargs:
+    freeze_value_head: false
+    freeze_action_head: false
+    resnet_pretrain: true
+    perception_output_neurons: 1000
+    measurements_neurons:
+    - 128
+    - 128
+    measurements_dropouts:
+    - 0.0
+    - 0.0
+    join_neurons:
+    - 512
+    - 512
+    - 256
+    join_dropouts:
+    - 0.0
+    - 0.0
+    - 0.0
+    speed_branch_neurons:
+    - 256
+    - 256
+    speed_branch_dropouts:
+    - 0.0
+    - 0.5
+    value_branch_neurons:
+    - 256
+    - 256
+    value_branch_dropouts:
+    - 0.0
+    - 0.5
+    number_of_branches: 6
+    branches_neurons:
+    - 256
+    - 256
+    branches_dropouts:
+    - 0.0
+    - 0.5
+    squash_outputs: false
+    perception_net: resnet34
+    traj_len: 4
+training:
+  entry_point: agents.cilrs.models.trainer_unit_t:Trainer
+  kwargs:
+    batch_size: 2
+    num_workers: 8
+    learning_rate: 0.0002
+    lr_schedule_factor: 0.5
+    branch_weights:
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    action_weights:
+    - 0.5
+    - 0.5
+    speed_weight: 0.05
+    value_weight: 0.001
+    features_weight: 0.2
+    waypoint_weight: 0.1
+    l1_loss: true
+    action_kl: true
+    action_agg: null
+    action_mll: null
+    starting_iteration: 0
+    starting_epoch: 0
+    im_augmentation: hard
+obs_configs:
+  speed:
+    module: actor_state.speed
+  gnss:
+    module: navigation.gnss_nonoise
+  central_rgb:
+    module: camera.rgb
+    fov: 70
+    width: 800
+    height: 450
+    location:
+    - 0.3
+    - 0.0
+    - 1.5
+    rotation:
+    - 0.0
+    - 0.0
+    - 0.0
+  route_plan:
+    module: navigation.waypoint_plan
+    steps: 20
+  birdview:
+    module: birdview.chauffeurnet
+    width_in_pixels: 192
+    pixels_ev_to_bottom: 40
+    pixels_per_meter: 5.0
+    history_idx:
+    - -16
+    - -11
+    - -6
+    - -1
+    scale_bbox: false
+unit:
+  image_save_iter: 20000
+  image_display_iter: 5000
+  display_size: 4
+  snapshot_save_iter: 5000
+  log_iter: 10
+  max_iter: 90000
+  batch_size: 2
+  weight_decay: 0.0001
+  beta1: 0.5
+  beta2: 0.999
+  init: kaiming
+  lr: 0.0002
+  lr_policy: step
+  step_size: 100000
+  gamma: 0.5
+  gan_w: 1
+  dis_w: 0.5
+  recon_x_w: 10
+  recon_h_w: 0
+  recon_kl_w: 0.01
+  recon_x_cyc_w: 10
+  recon_kl_cyc_w: 0.01
+  recon_x_w_L2: 10
+  recon_x_cyc_w_L2: 10
+  recon_latent: 2
+  vgg_w: 1
+  pair_hiddens_w: 10
+  pair_hiddens_cross_w: 10
+  pair_img_recon_w: 10
+  gen:
+    dim: 64
+    activ: relu
+    n_downsample: 3
+    n_res: 2
+    pad_type: reflect
+    crop_image_height: 450
+    crop_image_width: 800
+  dis:
+    dim: 64
+    norm: none
+    activ: lrelu
+    n_layer: 4
+    gan_type: lsgan
+    num_scales: 3
+    pad_type: reflect
+  input_dim_a: 3
+  input_dim_b: 3
+  num_workers: 8
+  new_size_a:
+  - 450
+  - 800
+  new_size_b:
+  - 450
+  - 800
+  crop_image_height: 450
+  crop_image_width: 800
+  vgg_model_path: /home/balink/carla-roach-unit/UNIT
+  data_root: /data/liye/Nuscenes/keyframe/

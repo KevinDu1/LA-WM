@@ -1,0 +1,18 @@
+TAG: 'mile'
+LOG_DIR: 'tensorboard_logs'
+
+GPUS: 1
+BATCHSIZE: 8
+STEPS: 100000
+
+OPTIMIZER:
+  ACCUMULATE_GRAD_BATCHES: 8
+
+RECEPTIVE_FIELD: 1
+FUTURE_HORIZON: 0
+
+PRETRAINED:
+  PATH: '/home/dujt/transfer-mile-1223/tensorboard_logs/02January2025at16:56:56CST_ubun_mile/epoch=74-step=16000.ckpt'
+
+DATASET:
+  DATAROOT: ''
